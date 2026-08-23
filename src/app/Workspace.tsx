@@ -27,6 +27,7 @@ import { offsetOf } from "../editor/locate";
 import { VizPane } from "../viz/VizPane";
 import { CatalogDialog } from "./CatalogDialog";
 import { DiagnosticsPanel } from "./DiagnosticsPanel";
+import { PanelResizeHandle } from "./PanelResizeHandle";
 import { PipelineStatus } from "./PipelineStatus";
 import { SplitPane } from "./SplitPane";
 import { readStoredBoolean, readStoredNumber, writeStored } from "./persist";
@@ -303,9 +304,8 @@ export function Workspace() {
           /* The definition is the panel you open to work on the model;
              the visualization is what the page is for. Kumo's Sidebar
              models exactly that: `contained` keeps it inside this
-             bounded row, its resize handle sizes it by drag — collapsing
-             it when dragged past the minimum and restoring it on the way
-             back — and `offcanvas` hides it outright. */
+             bounded row, and `offcanvas` hides it outright when the
+             header's toggle asks. */
           <Sidebar.Provider
             contained
             resizable
@@ -332,10 +332,12 @@ export function Workspace() {
           >
             {/* The panel holds an editor, which lays out and scrolls
                 itself, so its content goes straight in rather than
-                through `Sidebar.Content`'s padded scroll area. */}
+                through `Sidebar.Content`'s padded scroll area. The
+                handle is ours: dragging sizes the panel and stops at its
+                minimum, where Kumo's would collapse it. */}
             <Sidebar contentClassName="whitespace-normal">
               {editorPane}
-              <Sidebar.ResizeHandle />
+              <PanelResizeHandle />
             </Sidebar>
             <main className="min-w-0 flex-1">{vizPane}</main>
           </Sidebar.Provider>
