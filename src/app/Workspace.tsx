@@ -217,6 +217,28 @@ export function Workspace() {
             model's name and is the only element that shrinks, so the
             controls never wrap onto a second line. */}
         <header className="flex h-12 shrink-0 items-center gap-2 border-b border-kumo-hairline bg-kumo-base px-3 sm:gap-3 sm:px-4">
+          {/* Over the panel it acts on, at the same edge of the window —
+              a control for the left pane belongs on the left. Only where
+              there are two panes side by side: the narrow layout
+              switches between them with its own tabs. */}
+          {wide && (
+            <Tooltip
+              content={panelOpen ? "Hide the definition" : "Show the definition"}
+              render={
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  shape="square"
+                  icon={SidebarSimpleIcon}
+                  aria-label={panelOpen ? "Hide the definition" : "Show the definition"}
+                  aria-expanded={panelOpen}
+                  className={`-ml-1 shrink-0 ${panelOpen ? "" : "text-kumo-inactive"}`}
+                  onClick={() => setPanelOpen((open) => !open)}
+                />
+              }
+            />
+          )}
+
           <div className="flex shrink-0 items-baseline gap-2">
             <span className="font-semibold tracking-tight text-kumo-strong">archspec</span>
             <span className="hidden text-sm text-kumo-subtle sm:inline">playground</span>
@@ -238,25 +260,6 @@ export function Workspace() {
           />
 
           <div className="ml-auto flex shrink-0 items-center gap-2 sm:gap-3">
-            {/* Only where there are two panes side by side: the narrow
-                layout switches between them with its own tabs. */}
-            {wide && (
-              <Tooltip
-                content={panelOpen ? "Hide the definition" : "Show the definition"}
-                render={
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    shape="square"
-                    icon={SidebarSimpleIcon}
-                    aria-label={panelOpen ? "Hide the definition" : "Show the definition"}
-                    aria-expanded={panelOpen}
-                    className={panelOpen ? undefined : "text-kumo-inactive"}
-                    onClick={() => setPanelOpen((open) => !open)}
-                  />
-                }
-              />
-            )}
             <Switch
               size="sm"
               label="Verify"
