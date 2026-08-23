@@ -5,8 +5,10 @@ import { Sidebar } from "@cloudflare/kumo/components/sidebar";
 import { Switch } from "@cloudflare/kumo/components/switch";
 import { Tabs } from "@cloudflare/kumo/components/tabs";
 import { Tooltip, TooltipProvider } from "@cloudflare/kumo/components/tooltip";
+import { Banner } from "@cloudflare/kumo/components/banner";
 import {
   ArrowCounterClockwiseIcon,
+  BookOpenTextIcon,
   BooksIcon,
   CheckIcon,
   CopyIcon,
@@ -44,14 +46,19 @@ const PANEL_MAX_WIDTH = 900;
 const PANEL_DEFAULT_WIDTH = 560;
 const PANEL_WIDTH_KEY = "archspec-playground-panel-width";
 const PANEL_OPEN_KEY = "archspec-playground-panel-open";
+// Shown until it is dismissed or the document is opened: the semantics
+// are the thing a first-time reader most needs and would least expect to
+// need, since the editor looks self-explanatory and the verdicts do not.
+const DOCS_PROMPT_KEY = "archspec-playground-docs-prompt-seen";
 
-export function Workspace() {
+export function Workspace({ onOpenDocs }: { onOpenDocs: () => void }) {
   const draft = useDraft();
   const [verify, setVerify] = useState(true);
   const [catalogOpen, setCatalogOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [pane, setPane] = useState<"editor" | "viz">("editor");
   const [panelOpen, setPanelOpen] = useState(() => readStoredBoolean(PANEL_OPEN_KEY, true));
+  const [docsPrompt, setDocsPrompt] = useState(() => !readStoredBoolean(DOCS_PROMPT_KEY, false));
   const [theme, setTheme] = useTheme();
   const editor = useRef<YamlEditorHandle>(null);
 
@@ -71,6 +78,16 @@ export function Workspace() {
   useEffect(() => {
     writeStored(PANEL_OPEN_KEY, String(panelOpen));
   }, [panelOpen]);
+
+  const dismissDocsPrompt = useCallback(() => {
+    setDocsPrompt(false);
+    writeStored(DOCS_PROMPT_KEY, "true");
+  }, []);
+
+  const openDocs = useCallback(() => {
+    dismissDocsPrompt();
+    onOpenDocs();
+  }, [dismissDocsPrompt, onOpenDocs]);
 
   useEffect(() => {
     if (!copied) return;
@@ -260,6 +277,15 @@ export function Workspace() {
             }
           />
 
+          <Tooltip
+            content="What every declaration means, and what the checker proves"
+            render={
+              <Button variant="ghost" size="sm" icon={BookOpenTextIcon} className="shrink-0" onClick={openDocs}>
+                <span className="hidden md:inline">Semantics</span>
+              </Button>
+            }
+          />
+
           <div className="ml-auto flex shrink-0 items-center gap-2 sm:gap-3">
             <Switch
               size="sm"
@@ -299,6 +325,22 @@ export function Workspace() {
             />
           </div>
         </header>
+
+        {docsPrompt && (
+          <Banner
+            size="sm"
+            icon={<BookOpenTextIcon weight="fill" />}
+            title="New to Archspec?"
+            description="A declared requirement is not a guarantee — it is an obligation the checker has to prove, and “unknown” never means “violated”. The semantics document explains what each declaration means and exactly what the checker examines."
+            action={
+              <>
+                <Banner.Action onClick={openDocs}>Read the semantics</Banner.Action>
+                <Banner.Action onClick={dismissDocsPrompt}>Dismiss</Banner.Action>
+              </>
+            }
+            className="shrink-0 border-b border-kumo-hairline"
+          />
+        )}
 
         {wide ? (
           /* The definition is the panel you open to work on the model;
