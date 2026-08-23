@@ -1,0 +1,67 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  # One deploy at a time per branch; a superseded push need not finish.
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The archspec source the site is built against.
+          submodules: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: wasm
+
+      - uses: jetli/wasm-pack-action@v0.4.0
+        with:
+          version: latest
+
+      - run: npm ci
+
+      - name: Check the WebAssembly crate
+        run: npm run test:wasm
+
+      # No BASE_PATH: the site is served from the root of its own
+      # domain, both at archspec.umran.ca and at the .pages.dev URL.
+      - name: Build the site
+        run: npm run build
+
+      # Pushes to main publish; every other ref gets a preview
+      # deployment at its own URL, which is what makes pull_request
+      # builds worth running.
+      # A pull request from a fork cannot see the repository's secrets,
+      # so it builds and tests but does not deploy.
+      - name: Deploy to Cloudflare Pages
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: >-
+            pages deploy dist
+            --project-name=archspec-playground
+            --branch=${{ github.head_ref || github.ref_name }}

@@ -1,0 +1,16 @@
+# Cloudflare Pages reads this file from the site root.
+#
+# Every asset Vite emits carries a content hash in its name, so a given
+# URL's bytes never change: it can be cached for as long as the browser
+# is willing to. A new build produces new names, which is what makes a
+# deploy take effect despite the year-long lifetime.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# The entry point is the one file with a stable URL, so it must be
+# revalidated — otherwise a visitor keeps loading the previous build's
+# asset names indefinitely.
+/
+  Cache-Control: public, max-age=0, must-revalidate
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate

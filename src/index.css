@@ -1,0 +1,70 @@
+/* Kumo's utilities are compiled by Tailwind from the component sources it
+   ships, plus the viz front end imported from the vendored archspec tree.
+   Automatic source detection is off so the vendored Rust sources, YAML
+   fixtures, and prebuilt viz bundle are never scanned. */
+@source "../node_modules/@cloudflare/kumo/dist/**/*.{js,jsx,ts,tsx}";
+@source "../vendor/archspec/viz/src/**/*.{ts,tsx}";
+@source "./**/*.{ts,tsx}";
+@source "../index.html";
+@import "@cloudflare/kumo/styles/tailwind";
+@import "tailwindcss" source(none);
+
+/* ---------- app chrome ---------- */
+
+html, body, #root { height: 100%; }
+body { overflow: hidden; }
+
+/* ---------- editor: CodeMirror on Kumo tokens ---------- */
+
+:root {
+  --ed-keyword: #1d4ed8;
+  --ed-key: #0f766e;
+  --ed-string: #9a3412;
+  --ed-number: #6d28d9;
+  --ed-bool: #1d4ed8;
+  --ed-comment: var(--text-color-kumo-inactive);
+  --ed-punct: var(--text-color-kumo-subtle);
+  --ed-selection: color-mix(in srgb, var(--color-kumo-brand) 22%, transparent);
+  --ed-active-line: color-mix(in srgb, var(--color-kumo-brand) 6%, transparent);
+  --ed-error-bg: color-mix(in srgb, var(--color-kumo-danger) 18%, transparent);
+  --ed-warning-bg: color-mix(in srgb, var(--color-kumo-warning) 18%, transparent);
+}
+
+[data-mode="dark"] {
+  --ed-keyword: #93c5fd;
+  --ed-key: #5eead4;
+  --ed-string: #fdba74;
+  --ed-number: #c4b5fd;
+  --ed-bool: #93c5fd;
+}
+
+.cm-editor { height: 100%; font-size: 12.5px; }
+.cm-editor .cm-scroller {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  line-height: 1.55;
+}
+.cm-editor .cm-lint-marker-error { filter: none; }
+.cm-editor .cm-diagnostic-error { border-left-color: var(--color-kumo-danger); }
+.cm-editor .cm-diagnostic-warning { border-left-color: var(--color-kumo-warning); }
+.cm-editor .cm-diagnostic-info { border-left-color: var(--color-kumo-info); }
+.cm-editor .cm-lintRange-error { background: var(--ed-error-bg); }
+.cm-editor .cm-lintRange-warning { background: var(--ed-warning-bg); }
+.cm-editor .cm-lintRange-info { background: none; text-decoration: underline dotted var(--color-kumo-info); }
+.cm-editor .cm-tooltip {
+  background: var(--color-kumo-elevated);
+  color: var(--text-color-kumo-default);
+  border: 1px solid var(--color-kumo-line);
+  border-radius: 6px;
+  box-shadow: 0 4px 16px var(--color-kumo-shadow-drop);
+  font-size: 12px;
+  max-width: 40rem;
+}
+.cm-editor .cm-tooltip.cm-tooltip-lint ul { max-width: 40rem; }
+
+/* ---------- split pane ---------- */
+
+.split-handle { touch-action: none; }
+.split-handle:hover, .split-handle.dragging { background: var(--color-kumo-brand); }
+body.resizing, body.resizing * { user-select: none !important; }
+body.resizing-col, body.resizing-col * { cursor: col-resize !important; }
+body.resizing-row, body.resizing-row * { cursor: row-resize !important; }

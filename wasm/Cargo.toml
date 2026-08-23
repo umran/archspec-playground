@@ -1,0 +1,32 @@
+[package]
+name = "archspec-wasm"
+version = "0.1.0"
+edition = "2024"
+description = "archspec's parser, analyzer, model checker, and viz graph extraction compiled to WebAssembly for the browser demo"
+publish = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+# The archspec source itself, vendored as a git submodule. The parser,
+# validator, model checker, and report builder are used unchanged.
+archspec = { path = "../vendor/archspec" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+# Same YAML crate archspec uses, needed to read error locations.
+serde_yaml = { package = "serde_yaml_ng", version = "0.10" }
+wasm-bindgen = "0.2"
+console_error_panic_hook = "0.1"
+
+[profile.release]
+opt-level = "s"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
+
+# wasm-pack's bundled wasm-opt predates the bulk-memory features modern
+# rustc targets; `npm run build:wasm` runs a current one from binaryen.
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = false

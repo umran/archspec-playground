@@ -1,0 +1,43 @@
+{
+  "name": "archspec-playground",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "archspec in the browser: a catalog of models, a live YAML editor, the model checker, and the archspec-viz visualization \u2014 all client-side via WebAssembly",
+  "scripts": {
+    "dev": "npm run wasm && vite",
+    "dev:web": "vite",
+    "build": "npm run build:wasm && tsc -b && vite build",
+    "build:web": "tsc -b && vite build",
+    "wasm": "wasm-pack build wasm --target web --release --out-dir pkg --out-name archspec",
+    "build:wasm": "npm run wasm && wasm-opt -Os --enable-bulk-memory --enable-nontrapping-float-to-int --enable-sign-ext --enable-mutable-globals --enable-reference-types --enable-multivalue -o wasm/pkg/archspec_bg.wasm wasm/pkg/archspec_bg.wasm",
+    "test:wasm": "cargo test --manifest-path wasm/Cargo.toml --release",
+    "typecheck": "tsc -b",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@cloudflare/kumo": "^2.12.0",
+    "@codemirror/commands": "^6.8.1",
+    "@codemirror/lang-yaml": "^6.1.2",
+    "@codemirror/language": "^6.11.2",
+    "@codemirror/lint": "^6.8.5",
+    "@codemirror/search": "^6.5.11",
+    "@codemirror/state": "^6.5.2",
+    "@codemirror/view": "^6.38.1",
+    "@lezer/highlight": "^1.2.1",
+    "@phosphor-icons/react": "^2.1.10",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.0",
+    "@types/node": "^26.2.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "binaryen": "^123.0.0",
+    "tailwindcss": "^4.3.0",
+    "typescript": "^5.9.0",
+    "vite": "^7.0.0"
+  }
+}

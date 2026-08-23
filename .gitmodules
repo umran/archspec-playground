@@ -1,0 +1,4 @@
+[submodule "vendor/archspec"]
+	path = vendor/archspec
+	url = https://github.com/umran/archspec
+	branch = master
