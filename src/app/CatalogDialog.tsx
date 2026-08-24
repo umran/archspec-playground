@@ -5,12 +5,10 @@ import { CheckIcon, XIcon } from "@phosphor-icons/react";
 
 import { CATALOG, type CatalogEntry } from "../catalog";
 
-const OUTCOME: Record<CatalogEntry["expect"], { label: string; variant: "success" | "warning" | "error" | "neutral" }> = {
+const OUTCOME: Record<CatalogEntry["expect"], { label: string; variant: "success" | "warning" | "neutral" }> = {
   proven: { label: "every verifiable obligation proven", variant: "success" },
   unknown: { label: "some obligations unknown", variant: "warning" },
-  invalid: { label: "fails validation", variant: "error" },
-  "parse-error": { label: "fails to parse", variant: "error" },
-  trivial: { label: "no requirements to verify", variant: "neutral" },
+  blank: { label: "nothing declared yet", variant: "neutral" },
 };
 
 interface Props {
@@ -31,8 +29,8 @@ export function CatalogDialog({ open, onOpenChange, currentId, dirty, onSelect }
           <div>
             <Dialog.Title className="text-lg font-semibold text-kumo-strong">Model catalog</Dialog.Title>
             <Dialog.Description className="mt-0.5 text-sm text-kumo-subtle">
-              The worked examples from the archspec repository. Each one loads into the editor, where it can be
-              changed freely.
+              Worked examples from the archspec repository, and a blank model. Each one loads into the editor,
+              where it can be changed freely.
             </Dialog.Description>
           </div>
           <Dialog.Close

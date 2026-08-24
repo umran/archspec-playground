@@ -1,13 +1,17 @@
-// The demo catalog: archspec's own example models, imported from the
-// vendored source tree so they track the DSL as it evolves, plus a blank
-// model to start from.
+// The demo catalogue.
+//
+// Worked examples only: complete architectures that carry declared
+// requirements the checker actually has something to say about. A
+// fragment that parses but declares nothing teaches nothing here — the
+// blank model is the place to start from nothing, and it starts from
+// nothing entirely.
+//
+// The examples are imported from the vendored archspec tree rather than
+// copied, so they track the DSL as it changes.
 
-import scratch from "./models/scratch.yaml?raw";
 import flashCheckout from "../../vendor/archspec/tests/fixtures/flash_checkout.yaml?raw";
-import invalidServiceKind from "../../vendor/archspec/tests/fixtures/invalid_service_kind.yaml?raw";
-import keyedTopic from "../../vendor/archspec/tests/fixtures/keyed_topic.yaml?raw";
-import minimal from "../../vendor/archspec/tests/fixtures/minimal.yaml?raw";
 import videoStreaming from "../../vendor/archspec/tests/fixtures/video_streaming.yaml?raw";
+import blank from "./models/blank.yaml?raw";
 
 export interface CatalogEntry {
   id: string;
@@ -19,8 +23,8 @@ export interface CatalogEntry {
   /** Where the source comes from, shown above the editor. */
   path: string;
   source: string;
-  /** How this entry exercises the pipeline. */
-  expect: "proven" | "unknown" | "invalid" | "parse-error" | "trivial";
+  /** How this entry exercises the checker. */
+  expect: "proven" | "unknown" | "blank";
 }
 
 export const CATALOG: CatalogEntry[] = [
@@ -51,53 +55,17 @@ export const CATALOG: CatalogEntry[] = [
     expect: "proven",
   },
   {
-    id: "keyed_topic",
-    title: "Keyed topic",
-    blurb: "A topic with keyed ordering and keyed message identity, and a schema fragment that projects the key.",
+    id: "blank",
+    title: "Blank model",
+    blurb: "Nothing but the seven sections the DSL requires, each of them empty.",
     notes: [
-      "No operations yet — a good starting point for adding a publisher and a subscriber by hand.",
-      "Try changing the ordering kind to `unordered` or removing the fragment to watch validation react.",
+      "Every top-level section is required, so the empty frame is the least a model can be and still parse.",
+      "Declare a service, a schema, and an operation with an input and a flow, and the pipeline starts having something to check.",
+      "Obligations appear only where a requirement is declared — until then the checker has nothing to prove.",
     ],
-    path: "tests/fixtures/keyed_topic.yaml",
-    source: keyedTopic,
-    expect: "trivial",
-  },
-  {
-    id: "minimal",
-    title: "Minimal",
-    blurb: "The smallest model that parses and validates: one service, one schema, one topic.",
-    notes: [
-      "Every top-level section the DSL requires is present, most of them empty.",
-      "Rename `OrderCreated` in the topic's message list to see an unknown-reference validation error.",
-    ],
-    path: "tests/fixtures/minimal.yaml",
-    source: minimal,
-    expect: "trivial",
-  },
-  {
-    id: "invalid_service_kind",
-    title: "Parse failure",
-    blurb: "A model the parser rejects: an unknown service kind.",
-    notes: [
-      "The parser reports the offending line and column and the variants it would accept; the visualization keeps showing the last model that parsed.",
-      "Fix the kind (backend, frontend, worker, or job) and the model becomes valid.",
-    ],
-    path: "tests/fixtures/invalid_service_kind.yaml",
-    source: invalidServiceKind,
-    expect: "parse-error",
-  },
-  {
-    id: "scratch",
-    title: "Start from scratch",
-    blurb: "A blank model with one service, one schema, and one topic — and comments describing each section.",
-    notes: [
-      "Every top-level section the DSL requires is present, so the model parses from the first keystroke.",
-      "Add an operation with an input, a transaction, and a requirement, and the checker starts producing obligations.",
-      "Nothing is verified yet: obligations exist only where a requirement is declared.",
-    ],
-    path: "scratch.yaml",
-    source: scratch,
-    expect: "trivial",
+    path: "blank.yaml",
+    source: blank,
+    expect: "blank",
   },
 ];
 
