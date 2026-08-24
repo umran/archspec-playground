@@ -203,17 +203,12 @@ export function Workspace({ onOpenDocs }: { onOpenDocs: () => void }) {
         </div>
       }
       bottom={
-        <div className="flex h-full min-h-0 flex-col">
-          <div className="min-h-0 flex-1">
-            <DiagnosticsPanel
-              analysis={state.analysis}
-              entry={draft.entry}
-              onLocateId={locateId}
-              onLocateLine={locateLine}
-            />
-          </div>
-          <StatusBar state={state} verify={verify} />
-        </div>
+        <DiagnosticsPanel
+          analysis={state.analysis}
+          entry={draft.entry}
+          onLocateId={locateId}
+          onLocateLine={locateLine}
+        />
       }
     />
   );
@@ -408,6 +403,8 @@ export function Workspace({ onOpenDocs }: { onOpenDocs: () => void }) {
             </div>
           </div>
         )}
+
+        <StatusBar state={state} verify={verify} />
       </div>
 
       <CatalogDialog
@@ -429,23 +426,43 @@ function StatusBar({
   verify: boolean;
 }) {
   return (
-    // Items flow and fill each line rather than being pushed apart, so a
-    // narrow strip wraps once instead of splitting into a column.
-    <div className="flex shrink-0 flex-wrap items-center gap-x-3 gap-y-1 border-t border-kumo-hairline bg-kumo-base px-3 py-1.5">
-      <PipelineStatus state={state} verify={verify} />
-      <div className="flex items-center gap-2 text-xs text-kumo-inactive sm:ml-auto">
-        {state.failure && <span className="text-kumo-danger">{state.failure}</span>}
-        {(state.working || state.booting) && <Loader size="sm" />}
-        {state.timing && !state.working && (
-          <Tooltip
-            content="Time inside the archspec WebAssembly module: parse, validate, verify, and extract the graph"
-            render={<span className="cursor-default font-mono">{state.timing.wasmMs.toFixed(1)} ms</span>}
-          />
-        )}
-        {/* Which archspec built the module: useful, but the first
-            thing to drop when the strip is tight. */}
-        <span className="hidden font-mono sm:inline">archspec@{__ARCHSPEC_REV__}</span>
+    // The page's footer, not the panel's: it spans the window, so it
+    // survives collapsing the definition and has the width to hold its
+    // two halves apart. Where the answer came from on the left, what
+    // the answer was on the right. Both groups wrap internally, so a
+    // narrow window folds the line rather than splitting it into a
+    // column.
+    <footer className="flex shrink-0 flex-wrap items-center gap-x-4 gap-y-1 border-t border-kumo-hairline bg-kumo-base px-3 py-1.5 sm:px-4">
+      {/* What the run found, where reading starts. */}
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+        <PipelineStatus state={state} verify={verify} />
+        {state.failure && <span className="text-xs text-kumo-danger">{state.failure}</span>}
+        {/* Which archspec built the module: useful, and the first thing
+            to drop when the line is tight. */}
+        <Tooltip
+          content="The archspec commit this WebAssembly module was built from"
+          render={
+            <span className="hidden cursor-default font-mono text-xs text-kumo-inactive sm:inline">
+              archspec@{__ARCHSPEC_REV__}
+            </span>
+          }
+        />
       </div>
-    </div>
+
+      {/* How long it took, tucked to the far end: the one number that is
+          about the run rather than about the model. */}
+      <div className="flex items-center gap-2 text-xs text-kumo-inactive sm:ml-auto">
+        {state.working || state.booting ? (
+          <Loader size="sm" />
+        ) : (
+          state.timing && (
+            <Tooltip
+              content="Time inside the WebAssembly module: parse, validate, verify, and extract the graph"
+              render={<span className="cursor-default font-mono">{state.timing.wasmMs.toFixed(1)} ms</span>}
+            />
+          )
+        )}
+      </div>
+    </footer>
   );
 }
