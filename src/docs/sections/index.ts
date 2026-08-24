@@ -10,6 +10,7 @@ import { replay } from "./replay";
 import { report } from "./report";
 import { requirements } from "./requirements";
 import { stateMachines } from "./stateMachines";
+import { surface } from "./surface";
 import { transactions } from "./transactions";
 import type { DocSection } from "./types";
 
@@ -30,6 +31,7 @@ export type { DocSection };
  */
 export const SECTIONS: DocSection[] = [
   orientation,
+  surface,
   model,
   operations,
   dispatch,

@@ -142,7 +142,7 @@ export function Workspace({ onOpenDocs }: { onOpenDocs: () => void }) {
             </div>
             <div className="flex shrink-0 items-center gap-1">
               <Tooltip
-                content="Rewrite as archspec serializes the model"
+                content="Expand the shorthand: rewrite as archspec serializes the model"
                 render={
                   <Button
                     variant="ghost"
