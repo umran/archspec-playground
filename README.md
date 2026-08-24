@@ -42,6 +42,15 @@ Unknown is epistemic: the checker could not establish the property,
 typically because a required fact is `unspecified` or no V1 verifier
 attempts that family. It is never evidence of a violation.
 
+The parser takes the DSL's shorthand as readily as its canonical form —
+`order_id: uuid` for a field, `customer.id` for a path,
+`input:input.create_order.request` for a value source, a bare scalar for
+a selector literal — which is how the catalogue's models are written.
+Shorthand exists on input only: serialization emits the canonical form,
+so the editor's format button expands it. Which declarations may be
+compressed, and why the rest may not, is the document's *Canonical form
+and shorthand* section.
+
 The visualization is not a reimplementation. It is the archspec-viz
 React application, imported from `vendor/archspec/viz/src` and handed
 the page data the WebAssembly build produces, in place of the
@@ -79,9 +88,10 @@ vendor/archspec/       submodule: the archspec source
 The WebAssembly module exposes two functions. `analyze(source, title,
 verify)` returns the page data plus the diagnostics the CLIs print to
 stderr; `canonicalize(source)` returns the model as archspec serializes
-it, behind the editor's format button. `wasm/src/lib.rs` includes
-archspec-viz's own `graph.rs` by path rather than copying it, so the
-graph the browser draws is the graph the CLI draws.
+it — canonical throughout, so shorthand comes back expanded — behind
+the editor's format button. `wasm/src/lib.rs` includes archspec-viz's
+own `graph.rs` by path rather than copying it, so the graph the browser
+draws is the graph the CLI draws.
 
 Analysis runs in a Web Worker. Requests are latest-wins: a burst of
 keystrokes costs at most one extra run, and a worker lost to a panic is
