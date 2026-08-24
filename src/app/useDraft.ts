@@ -3,6 +3,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { DEFAULT_ENTRY, catalogEntry, type CatalogEntry } from "../catalog";
 
 const DRAFT_PREFIX = "archspec-playground-draft:";
+// The fixture a draft was made against. A draft is an edit *of* a
+// catalog entry, and only means anything while that entry reads as it
+// did when the edit was made. When the vendored fixture changes under
+// it — the DSL gains shorthand, say — the old draft would otherwise
+// shadow the new example forever, keyed by an id that never changes.
+const DRAFT_BASE_PREFIX = "archspec-playground-draft-base:";
 const LAST_KEY = "archspec-playground-model";
 
 /** Which model the URL asks for; the hash belongs to the visualization. */
@@ -16,6 +22,29 @@ function storedDraft(id: string): string | null {
   } catch {
     return null;
   }
+}
+
+function storedBase(id: string): string | null {
+  try {
+    return window.localStorage.getItem(DRAFT_BASE_PREFIX + id);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * The source to open an entry at: a draft if one was made against the
+ * fixture as it now stands, otherwise the fixture itself.
+ *
+ * A draft whose base no longer matches — the catalogue was updated since
+ * it was saved, or it predates bases being recorded — yields to the new
+ * source rather than hiding it. The persistence effect then clears the
+ * stale keys, since the restored source equals the fixture.
+ */
+function sourceFor(entry: CatalogEntry): string {
+  const draft = storedDraft(entry.id);
+  if (draft === null) return entry.source;
+  return storedBase(entry.id) === entry.source ? draft : entry.source;
 }
 
 function initialEntry(): CatalogEntry {
@@ -46,10 +75,7 @@ export interface Draft {
  */
 export function useDraft(): Draft {
   const [entry, setEntry] = useState<CatalogEntry>(initialEntry);
-  const [source, setSource] = useState<string>(() => {
-    const start = initialEntry();
-    return storedDraft(start.id) ?? start.source;
-  });
+  const [source, setSource] = useState<string>(() => sourceFor(initialEntry()));
 
   // Persisting on every keystroke is wasteful; a short idle is enough to
   // survive a reload without writing on each character.
@@ -58,8 +84,15 @@ export function useDraft(): Draft {
     window.clearTimeout(timer.current);
     timer.current = window.setTimeout(() => {
       try {
-        if (source === entry.source) window.localStorage.removeItem(DRAFT_PREFIX + entry.id);
-        else window.localStorage.setItem(DRAFT_PREFIX + entry.id, source);
+        if (source === entry.source) {
+          window.localStorage.removeItem(DRAFT_PREFIX + entry.id);
+          window.localStorage.removeItem(DRAFT_BASE_PREFIX + entry.id);
+        } else {
+          window.localStorage.setItem(DRAFT_PREFIX + entry.id, source);
+          // The fixture this draft edits, so a later change to it can be
+          // told from an edit the reader made.
+          window.localStorage.setItem(DRAFT_BASE_PREFIX + entry.id, entry.source);
+        }
       } catch {
         // Storage may be unavailable or full; drafts are a convenience.
       }
@@ -93,7 +126,7 @@ export function useDraft(): Draft {
       const next = catalogEntry(requestedId());
       if (!next || next.id === openEntry.current.id) return;
       setEntry(next);
-      setSource(storedDraft(next.id) ?? next.source);
+      setSource(sourceFor(next));
     };
     window.addEventListener("popstate", onPopState);
     return () => window.removeEventListener("popstate", onPopState);
@@ -101,7 +134,7 @@ export function useDraft(): Draft {
 
   const open = useCallback((next: CatalogEntry) => {
     setEntry(next);
-    setSource(storedDraft(next.id) ?? next.source);
+    setSource(sourceFor(next));
     // A different model makes the current route meaningless.
     window.location.hash = "#/system";
   }, []);
