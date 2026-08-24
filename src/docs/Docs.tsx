@@ -3,88 +3,17 @@ import { Sidebar } from "@cloudflare/kumo/components/sidebar";
 import { TableOfContents } from "@cloudflare/kumo/components/table-of-contents";
 import { Tooltip, TooltipProvider } from "@cloudflare/kumo/components/tooltip";
 import { ArrowLeftIcon, GithubLogoIcon, MoonIcon, SidebarSimpleIcon, SunIcon } from "@phosphor-icons/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { useTheme } from "../app/theme";
 import { useMediaQuery } from "../app/useMediaQuery";
-import { FoundationsSections } from "./sections/foundations";
-import { MechanismSections } from "./sections/mechanisms";
-import { RequirementsSections } from "./sections/requirements";
+import { Section } from "./parts";
+import { SECTIONS } from "./sections";
 
 const REPO = "https://github.com/umran/archspec";
 const SEMANTICS = "https://github.com/umran/archspec/blob/master/ARCHSPEC_DSL_SEMANTICS.md";
 
-/** The document's shape, and the sidebar's contents. One source for both. */
-const NAV: { id: string; title: string; items: { id: string; title: string }[] }[] = [
-  {
-    id: "orientation",
-    title: "Orientation",
-    items: [
-      { id: "categories", title: "Three kinds of declaration" },
-      { id: "unspecified", title: "Unknown is not false" },
-      { id: "verdicts", title: "Reading a verdict" },
-    ],
-  },
-  {
-    id: "structure",
-    title: "The model",
-    items: [
-      { id: "schemas", title: "Schemas and value identity" },
-      { id: "topics", title: "Topics" },
-      { id: "operations", title: "Operations and flows" },
-    ],
-  },
-  {
-    id: "dispatch",
-    title: "Inputs and dispatch",
-    items: [
-      { id: "input-kinds", title: "Request and subscription" },
-      { id: "delivery", title: "Delivery and lanes" },
-    ],
-  },
-  {
-    id: "keys",
-    title: "Keys and populations",
-    items: [
-      { id: "idempotency-key", title: "Idempotency keys" },
-      { id: "governing-key", title: "The governing key" },
-      { id: "propagation", title: "Key propagation" },
-    ],
-  },
-  {
-    id: "requirements",
-    title: "Operation requirements",
-    items: [
-      { id: "serialization", title: "Serialization" },
-      { id: "ordering", title: "Ordering" },
-      { id: "idempotency", title: "Idempotency" },
-      { id: "response-replay", title: "Response replay" },
-      { id: "recoverability", title: "Recoverability" },
-      { id: "object-history", title: "Object history" },
-    ],
-  },
-  {
-    id: "effects",
-    title: "Effects and duplicate safety",
-    items: [
-      { id: "effect-kinds", title: "The three effect kinds" },
-      { id: "cascade", title: "The cascade" },
-    ],
-  },
-  {
-    id: "replay",
-    title: "Transactions and replay",
-    items: [
-      { id: "stability", title: "Replay-stable roots" },
-      { id: "natural-replay", title: "Natural replayability" },
-      { id: "keyed-commit", title: "Keyed commit" },
-    ],
-  },
-  { id: "distinctions", title: "Distinctions", items: [] },
-  { id: "report", title: "Reading the report", items: [] },
-];
-
-const ALL_IDS = NAV.flatMap((group) => [group.id, ...group.items.map((item) => item.id)]);
+const ALL_IDS = SECTIONS.flatMap((section) => [section.id, ...section.items.map((item) => item.id)]);
 
 /**
  * Highlights the heading the reader is at.
@@ -122,6 +51,19 @@ function useActiveSection(scroller: HTMLElement | null): string {
 }
 
 export function Docs({ onBack }: { onBack: () => void }) {
+  // A contents entry pointing at no heading, or a heading in no entry,
+  // is exactly how a section goes missing without anyone noticing.
+  useEffect(() => {
+    if (!import.meta.env.DEV) return;
+    const missing = ALL_IDS.filter((id) => !document.getElementById(id));
+    if (missing.length) console.warn("docs: contents entries with no section:", missing);
+    const listed = new Set(ALL_IDS);
+    const unlisted = [...document.querySelectorAll("section[id]")]
+      .map((el) => el.id)
+      .filter((id) => !listed.has(id));
+    if (unlisted.length) console.warn("docs: sections missing from the contents:", unlisted);
+  }, []);
+
   const [theme, setTheme] = useTheme();
   const wide = useMediaQuery("(min-width: 900px)");
   // Open beside the text where there is room for both, shut where the
@@ -129,6 +71,17 @@ export function Docs({ onBack }: { onBack: () => void }) {
   const [navOpen, setNavOpen] = useState(() => window.matchMedia("(min-width: 900px)").matches);
   const [scroller, setScroller] = useState<HTMLElement | null>(null);
   const active = useActiveSection(scroller);
+
+  // Follow the breakpoint when it is crossed, but not otherwise: a
+  // deliberate close on a wide screen should survive a scroll or a
+  // re-render, and only a change of layout should overrule it.
+  const wasWide = useRef(wide);
+  useEffect(() => {
+    if (wasWide.current !== wide) {
+      wasWide.current = wide;
+      setNavOpen(wide);
+    }
+  }, [wide]);
 
   const go = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -145,11 +98,11 @@ export function Docs({ onBack }: { onBack: () => void }) {
       <TableOfContents>
         <TableOfContents.Title>On this page</TableOfContents.Title>
         <TableOfContents.List>
-          {NAV.map((group) => (
+          {SECTIONS.map((group) => (
             <TableOfContents.Group
               key={group.id}
               label={group.title}
-              active={active === group.id || group.items.some((item) => item.id === active)}
+              active={active === group.id}
               href={`#${group.id}`}
               onClick={(event: React.MouseEvent) => {
                 event.preventDefault();
@@ -175,7 +128,7 @@ export function Docs({ onBack }: { onBack: () => void }) {
 
   const body = (
     <main ref={setScroller} className="min-w-0 flex-1 overflow-y-auto">
-      <div className="mx-auto max-w-[54rem] px-5 py-10 sm:px-8">
+      <div className="max-w-[60rem] px-5 py-10 sm:px-8 lg:px-12">
         <header className="pb-10">
           <h1 className="text-3xl font-semibold tracking-tight text-kumo-strong">Archspec semantics</h1>
           <p className="mt-3 max-w-[68ch] text-[15px] leading-relaxed text-kumo-subtle">
@@ -193,9 +146,11 @@ export function Docs({ onBack }: { onBack: () => void }) {
         </header>
 
         <div className="space-y-10 pb-24">
-          <FoundationsSections />
-          <RequirementsSections />
-          <MechanismSections />
+          {SECTIONS.map((section) => (
+            <Section key={section.id} id={section.id} title={section.title} lede={section.lede}>
+              <section.Body />
+            </Section>
+          ))}
         </div>
       </div>
     </main>
@@ -276,7 +231,7 @@ export function Docs({ onBack }: { onBack: () => void }) {
           /* Narrow, the contents overlay the text rather than share the
              width with it: at 375px a 288px rail would leave the prose
              a column one word wide. */
-          <div className="relative min-h-0 flex-1">
+          <div className="relative flex min-h-0 flex-1">
             {body}
             {navOpen && (
               <>

@@ -330,11 +330,10 @@ export function Workspace({ onOpenDocs }: { onOpenDocs: () => void }) {
           <Banner
             size="sm"
             icon={<BookOpenTextIcon weight="fill" />}
-            title="New to Archspec?"
-            description="A declared requirement is not a guarantee — it is an obligation the checker has to prove, and “unknown” never means “violated”. The semantics document explains what each declaration means and exactly what the checker examines."
+            description="New to Archspec? Read the semantics."
             action={
               <>
-                <Banner.Action onClick={openDocs}>Read the semantics</Banner.Action>
+                <Banner.Action onClick={openDocs}>Open</Banner.Action>
                 <Banner.Action onClick={dismissDocsPrompt}>Dismiss</Banner.Action>
               </>
             }
