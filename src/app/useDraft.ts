@@ -2,14 +2,14 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { DEFAULT_ENTRY, catalogEntry, type CatalogEntry } from "../catalog";
 
-const DRAFT_PREFIX = "archspec-playground-draft:";
+const DRAFT_PREFIX = "conseqa-playground-draft:";
 // The fixture a draft was made against. A draft is an edit *of* a
 // catalog entry, and only means anything while that entry reads as it
 // did when the edit was made. When the vendored fixture changes under
 // it — the DSL gains shorthand, say — the old draft would otherwise
 // shadow the new example forever, keyed by an id that never changes.
-const DRAFT_BASE_PREFIX = "archspec-playground-draft-base:";
-const LAST_KEY = "archspec-playground-model";
+const DRAFT_BASE_PREFIX = "conseqa-playground-draft-base:";
+const LAST_KEY = "conseqa-playground-model";
 
 /** Which model the URL asks for; the hash belongs to the visualization. */
 function requestedId(): string | null {

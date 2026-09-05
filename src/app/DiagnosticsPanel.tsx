@@ -214,7 +214,7 @@ function AboutModel({ entry }: { entry: CatalogEntry }) {
           </li>
         ))}
       </ul>
-      <p className="font-mono text-xs text-kumo-inactive">archspec/{entry.path}</p>
+      <p className="font-mono text-xs text-kumo-inactive">conseqa/{entry.path}</p>
     </div>
   );
 }

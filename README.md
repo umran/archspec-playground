@@ -1,11 +1,14 @@
-# archspec playground
+# conseqa playground
 
-A browser demonstration of [archspec](https://github.com/umran/archspec):
+A browser demonstration of [conseqa](https://github.com/umran/conseqa):
 a catalog of worked example models, a live YAML editor, and the model
 checker's verdicts overlaid on the interactive visualization — with no
 server involved. Parsing, validation, verification, and graph extraction
-all run in WebAssembly compiled from the archspec source; the build
-output is a static directory that any file host can serve.
+all run in WebAssembly compiled from the conseqa source; the build
+output is a static directory that any file host can serve. The DSL's
+semantics are documented at
+[docs.conseqa.umran.ca](https://docs.conseqa.umran.ca), which the
+playground links to rather than carrying a copy of its own.
 
 ```
 npm install
@@ -19,22 +22,22 @@ takes effect on restart. `build` additionally runs `wasm-opt`, which
 takes roughly twelve seconds and is the reason it is not in the dev
 loop.
 
-`vendor/archspec` is a git submodule pinned to the commit the site is
-built against, on archspec's `master`. Clone with
+`vendor/conseqa` is a git submodule pinned to the commit the site is
+built against, on conseqa's `master`. Clone with
 `--recurse-submodules`, or run `git submodule update --init` in an
 existing checkout; `git submodule update --remote` moves it forward.
 
 ## What it does
 
-Every keystroke, debounced, runs the same pipeline the `archspec` and
-`archspec-viz` CLIs run:
+Every keystroke, debounced, runs the same pipeline the `conseqa` and
+`conseqa-viz` CLIs run:
 
 | pass | what it does | what the page shows |
 | --- | --- | --- |
-| parse | `archspec::parser::yaml` deserializes the source | the error's line and column, marked in the editor |
-| validate | `archspec::analyzer::validate` checks ids and references | structural errors, each clickable to its declaration |
-| verify | `archspec::analyzer::verification` runs the model checker | the obligation report: proven, unknown, disproven |
-| extract | `archspec-viz`'s graph extractor resolves the DSL's indirections | the system graph, operation flows, state machines |
+| parse | `conseqa::parser::yaml` deserializes the source | the error's line and column, marked in the editor |
+| validate | `conseqa::analyzer::validate` checks ids and references | structural errors, each clickable to its declaration |
+| verify | `conseqa::analyzer::verification` runs the model checker | the obligation report: proven, unknown, disproven |
+| extract | `conseqa-viz`'s graph extractor resolves the DSL's indirections | the system graph, operation programs, state machines |
 
 Verification is attempted only over a valid model, exactly as the CLI
 does — verdicts are meaningful only over a structurally coherent model.
@@ -44,17 +47,17 @@ attempts that family. It is never evidence of a violation.
 
 The parser takes the DSL's shorthand as readily as its canonical form —
 `order_id: uuid` for a field, `customer.id` for a path,
-`input:input.create_order.request` for a value source, a bare scalar for
-a selector literal — which is how the catalogue's models are written.
+`input:input.create_order.request` for a value source, a bare schema id
+for an error contract — which is how the catalogue's models are written.
 Shorthand exists on input only: serialization emits the canonical form,
 so the editor's format button expands it. Which declarations may be
-compressed, and why the rest may not, is the document's *Canonical form
-and shorthand* section.
+compressed, and why the rest may not, is the semantics document's
+*Canonical form and shorthand* section.
 
-The visualization is not a reimplementation. It is the archspec-viz
-React application, imported from `vendor/archspec/viz/src` and handed
+The visualization is not a reimplementation. It is the conseqa-viz
+React application, imported from `vendor/conseqa/viz/src` and handed
 the page data the WebAssembly build produces, in place of the
-`window.ARCHSPEC` blob the CLI injects into the HTML it writes. It is
+`window.CONSEQA` blob the CLI injects into the HTML it writes. It is
 mounted once and fed new data as the model changes, so the open route,
 the selection, and the canvas's pan and zoom survive every keystroke.
 
@@ -75,21 +78,21 @@ way, so its undo history and scroll position survive both.
 ## Layout
 
 ```
-wasm/                  Rust: one `analyze` entry point over the archspec crate
+wasm/                  Rust: one `analyze` entry point over the conseqa crate
   src/lib.rs           parse → validate → verify → report → graph, as JSON
 src/analysis/          the worker hosting the module, and the client driving it
 src/editor/            CodeMirror 6: YAML, Kumo-token theme, analyzer diagnostics
 src/catalog/           the demo models, imported from the vendored fixtures
-src/viz/               mounts the vendored archspec-viz front end
+src/viz/               mounts the vendored conseqa-viz front end
 src/app/               the shell: header, panes, diagnostics, catalog
-vendor/archspec/       submodule: the archspec source
+vendor/conseqa/        submodule: the conseqa source
 ```
 
 The WebAssembly module exposes two functions. `analyze(source, title,
 verify)` returns the page data plus the diagnostics the CLIs print to
-stderr; `canonicalize(source)` returns the model as archspec serializes
+stderr; `canonicalize(source)` returns the model as conseqa serializes
 it — canonical throughout, so shorthand comes back expanded — behind
-the editor's format button. `wasm/src/lib.rs` includes archspec-viz's
+the editor's format button. `wasm/src/lib.rs` includes conseqa-viz's
 own `graph.rs` by path rather than copying it, so the graph the browser
 draws is the graph the CLI draws.
 
@@ -104,7 +107,7 @@ the root of its own domain, so no base path is needed:
 
 ```
 npm run build
-npx wrangler pages deploy dist --project-name=archspec-playground
+npx wrangler pages deploy dist --project-name=conseqa-playground
 ```
 
 `.github/workflows/deploy.yml` does that on every push: it builds with
@@ -122,7 +125,7 @@ the finished directory.
 1. Create the project, once, from a machine with `wrangler login` done:
 
    ```
-   npx wrangler pages project create archspec-playground --production-branch=main
+   npx wrangler pages project create conseqa-playground --production-branch=main
    ```
 
 2. Add two repository secrets, from **Settings → Secrets and variables →
@@ -130,7 +133,7 @@ the finished directory.
    Pages: Edit* permission) and `CLOUDFLARE_ACCOUNT_ID`.
 
 3. In the Pages project, under **Custom domains**, add
-   `archspec.umran.ca`. `umran.ca` is already on Cloudflare
+   `conseqa.umran.ca`. `umran.ca` is already on Cloudflare
    nameservers, so the `CNAME` record and the certificate are created
    for you.
 
@@ -149,7 +152,7 @@ are needed. There are no server-side routes to rewrite either: the app
 lives at `/`, and both the open model and the visualization's route are
 carried in the query string and the fragment.
 
-Unlike the single file `archspec-viz` writes, this site does need to be
+Unlike the single file `conseqa-viz` writes, this site does need to be
 *served*: a Web Worker and a streamed WebAssembly module cannot load
 from a `file://` URL. `npm run preview` serves the built `dist/`
 locally.
@@ -158,6 +161,6 @@ locally.
 
 `npm run test:wasm` runs the WebAssembly crate's tests natively:
 end-to-end analysis of the worked examples, parse-error locations, and
-the refusal to verify an invalid model — plus archspec-viz's own
+the refusal to verify an invalid model — plus conseqa-viz's own
 graph-extraction tests, which come along with the module included by
 path and run against the vendored fixtures.

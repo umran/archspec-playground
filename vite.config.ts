@@ -6,17 +6,17 @@ import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig, type Plugin } from "vite";
 
-const VIZ_THEME_ID = "virtual:archspec-viz-theme.css";
-const VIZ_THEME_FILE = resolve("vendor/archspec/viz/src/index.css");
+const VIZ_THEME_ID = "virtual:conseqa-viz-theme.css";
+const VIZ_THEME_FILE = resolve("vendor/conseqa/viz/src/index.css");
 
 /**
- * The graph theme the archspec-viz front end ships with, served as plain
+ * The graph theme the conseqa-viz front end ships with, served as plain
  * CSS. The vendored file also carries the Tailwind and Kumo setup an app
  * entry point needs; this project's own `src/index.css` does that once,
  * so those directives are dropped here rather than duplicating Tailwind's
  * whole utility layer. Everything below them — the `--arch-*` tokens and
  * the `.arch-*` rules the SVG views depend on — is used verbatim, so the
- * visualization keeps looking exactly as archspec renders it.
+ * visualization keeps looking exactly as conseqa renders it.
  */
 function vizTheme(): Plugin {
   const load = () =>
@@ -26,7 +26,7 @@ function vizTheme(): Plugin {
       .join("\n");
 
   return {
-    name: "archspec-viz-theme",
+    name: "conseqa-viz-theme",
     resolveId: (id) => (id === VIZ_THEME_ID ? "\0" + VIZ_THEME_ID : null),
     load: (id) => (id === "\0" + VIZ_THEME_ID ? load() : null),
     configureServer(server) {
@@ -40,10 +40,10 @@ function vizTheme(): Plugin {
   };
 }
 
-/** The vendored archspec commit, shown in the app footer. */
-function archspecRevision(): string {
+/** The vendored conseqa commit, shown in the app footer. */
+function conseqaRevision(): string {
   try {
-    return execSync("git -C vendor/archspec rev-parse --short HEAD", {
+    return execSync("git -C vendor/conseqa rev-parse --short HEAD", {
       encoding: "utf8",
       stdio: ["ignore", "pipe", "ignore"],
     }).trim();
@@ -60,7 +60,7 @@ export default defineConfig({
   base: process.env.BASE_PATH ?? "/",
   plugins: [react(), tailwindcss(), vizTheme()],
   define: {
-    __ARCHSPEC_REV__: JSON.stringify(archspecRevision()),
+    __CONSEQA_REV__: JSON.stringify(conseqaRevision()),
   },
   resolve: {
     // The viz front end is imported from the vendored tree, which grows
@@ -96,6 +96,6 @@ export default defineConfig({
   optimizeDeps: {
     // The viz front end is imported straight from the vendored source
     // tree; scanning it up front avoids a dependency re-bundle mid-session.
-    entries: ["index.html", "vendor/archspec/viz/src/**/*.{ts,tsx}"],
+    entries: ["index.html", "vendor/conseqa/viz/src/**/*.{ts,tsx}"],
   },
 });

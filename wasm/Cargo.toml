@@ -1,20 +1,20 @@
 [package]
-name = "archspec-wasm"
+name = "conseqa-wasm"
 version = "0.1.0"
 edition = "2024"
-description = "archspec's parser, analyzer, model checker, and viz graph extraction compiled to WebAssembly for the browser demo"
+description = "conseqa's parser, analyzer, model checker, and viz graph extraction compiled to WebAssembly for the browser demo"
 publish = false
 
 [lib]
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-# The archspec source itself, vendored as a git submodule. The parser,
+# The conseqa source itself, vendored as a git submodule. The parser,
 # validator, model checker, and report builder are used unchanged.
-archspec = { path = "../vendor/archspec" }
+conseqa = { path = "../vendor/conseqa" }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-# Same YAML crate archspec uses, needed to read error locations.
+# Same YAML crate conseqa uses, needed to read error locations.
 serde_yaml = { package = "serde_yaml_ng", version = "0.10" }
 wasm-bindgen = "0.2"
 console_error_panic_hook = "0.1"

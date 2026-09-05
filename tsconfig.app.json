@@ -43,6 +43,6 @@
   },
   "include": [
     "src",
-    "vendor/archspec/viz/src"
+    "vendor/conseqa/viz/src"
   ]
 }

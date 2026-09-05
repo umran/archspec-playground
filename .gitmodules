@@ -1,4 +1,4 @@
-[submodule "vendor/archspec"]
-	path = vendor/archspec
-	url = https://github.com/umran/archspec
+[submodule "vendor/conseqa"]
+	path = vendor/conseqa
+	url = https://github.com/umran/conseqa
 	branch = master

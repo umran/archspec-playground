@@ -42,7 +42,7 @@ export interface AnalysisOptions {
 }
 
 /**
- * Runs the archspec pipeline over `source` as it changes, debounced, and
+ * Runs the conseqa pipeline over `source` as it changes, debounced, and
  * exposes the latest outcome. Results arriving for superseded sources
  * are discarded, so the state never regresses to an older edit.
  */
