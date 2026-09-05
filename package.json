@@ -1,16 +1,16 @@
 {
-  "name": "archspec-playground",
+  "name": "conseqa-playground",
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "archspec in the browser: a catalog of models, a live YAML editor, the model checker, and the archspec-viz visualization \u2014 all client-side via WebAssembly",
+  "description": "conseqa in the browser: a catalog of models, a live YAML editor, the model checker, and the conseqa-viz visualization \u2014 all client-side via WebAssembly",
   "scripts": {
     "dev": "npm run wasm && vite",
     "dev:web": "vite",
     "build": "npm run build:wasm && tsc -b && vite build",
     "build:web": "tsc -b && vite build",
-    "wasm": "wasm-pack build wasm --target web --release --out-dir pkg --out-name archspec",
-    "build:wasm": "npm run wasm && wasm-opt -Os --enable-bulk-memory --enable-nontrapping-float-to-int --enable-sign-ext --enable-mutable-globals --enable-reference-types --enable-multivalue -o wasm/pkg/archspec_bg.wasm wasm/pkg/archspec_bg.wasm",
+    "wasm": "wasm-pack build wasm --target web --release --out-dir pkg --out-name conseqa",
+    "build:wasm": "npm run wasm && wasm-opt -Os --enable-bulk-memory --enable-nontrapping-float-to-int --enable-sign-ext --enable-mutable-globals --enable-reference-types --enable-multivalue -o wasm/pkg/conseqa_bg.wasm wasm/pkg/conseqa_bg.wasm",
     "test:wasm": "cargo test --manifest-path wasm/Cargo.toml --release",
     "typecheck": "tsc -b",
     "preview": "vite preview"

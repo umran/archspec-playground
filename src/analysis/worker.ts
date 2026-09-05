@@ -1,12 +1,12 @@
 /// <reference lib="webworker" />
 
-// The analysis worker: hosts the archspec WebAssembly module and runs the
+// The analysis worker: hosts the conseqa WebAssembly module and runs the
 // pipeline off the main thread so the editor stays responsive however
 // large the model. One request is processed at a time; the client
 // coalesces bursts of edits so the worker never falls behind.
 
-import init, { analyze, canonicalize } from "../../wasm/pkg/archspec.js";
-import wasmUrl from "../../wasm/pkg/archspec_bg.wasm?url";
+import init, { analyze, canonicalize } from "../../wasm/pkg/conseqa.js";
+import wasmUrl from "../../wasm/pkg/conseqa_bg.wasm?url";
 
 import type { WorkerRequest, WorkerResponse } from "./protocol";
 
@@ -42,7 +42,7 @@ self.onmessage = async (event: MessageEvent<WorkerRequest>) => {
     // Not fatal in the client's sense: replacing this worker would only
     // load the same module from the same URL and fail the same way. The
     // `boot-failed` message it already has is what the page reports.
-    post({ type: "failed", id: request.id, message: "archspec failed to load", fatal: false });
+    post({ type: "failed", id: request.id, message: "conseqa failed to load", fatal: false });
     return;
   }
 
@@ -71,7 +71,7 @@ self.onmessage = async (event: MessageEvent<WorkerRequest>) => {
     post({
       type: "failed",
       id: request.id,
-      message: panic ? `archspec panicked: ${panic}` : describe(error),
+      message: panic ? `conseqa panicked: ${panic}` : describe(error),
       fatal: true,
     });
   }

@@ -1,2 +1,2 @@
-/** Short hash of the vendored archspec commit, injected by vite.config.ts. */
-declare const __ARCHSPEC_REV__: string;
+/** Short hash of the vendored conseqa commit, injected by vite.config.ts. */
+declare const __CONSEQA_REV__: string;

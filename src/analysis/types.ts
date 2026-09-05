@@ -1,6 +1,6 @@
-// Mirror of the JSON `archspec_wasm::analyze` returns (see wasm/src/lib.rs).
+// Mirror of the JSON `conseqa_wasm::analyze` returns (see wasm/src/lib.rs).
 
-import type { PageData } from "../../vendor/archspec/viz/src/types/page";
+import type { PageData } from "../../vendor/conseqa/viz/src/types/page";
 
 export type { PageData };
 

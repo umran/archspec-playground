@@ -2,14 +2,14 @@
 //
 // This app owns the mode outright: it sets `data-mode` on the document
 // root, persists the choice, and passes the mode to the embedded
-// archspec-viz views, which take it as a prop and render no control of
+// conseqa-viz views, which take it as a prop and render no control of
 // their own. One setting, one control, one writer.
 
 import { useCallback, useEffect, useSyncExternalStore } from "react";
 
 export type Theme = "dark" | "light";
 
-const KEY = "archspec-playground-theme";
+const KEY = "conseqa-playground-theme";
 const listeners = new Set<() => void>();
 
 function read(): Theme {

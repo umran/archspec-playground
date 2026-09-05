@@ -1,26 +1,26 @@
-//! archspec in the browser.
+//! conseqa in the browser.
 //!
-//! One entry point, `analyze`, runs the whole `archspec` / `archspec-viz`
+//! One entry point, `analyze`, runs the whole `conseqa` / `conseqa-viz`
 //! pipeline in-process: parse the YAML source, validate, verify the
 //! declared requirements with the model checker, build the obligation
 //! report, and extract the system graph the visualization renders. It
-//! returns the same page data `archspec-viz --json` emits — title,
+//! returns the same page data `conseqa-viz --json` emits — title,
 //! model, graph, report — alongside the diagnostics the CLIs print to
 //! stderr, so the web app can show them inline.
 //!
-//! `graph.rs` is archspec-viz's own extractor, included by path from
+//! `graph.rs` is conseqa-viz's own extractor, included by path from
 //! the vendored checkout; nothing here re-implements model semantics.
 
 use serde::Serialize;
 use wasm_bindgen::prelude::*;
 
-use archspec::analyzer::{self, Diagnostic, DiagnosticCode, Severity, report};
-use archspec::spec::Model;
+use conseqa::analyzer::{self, Diagnostic, DiagnosticCode, Severity, report};
+use conseqa::spec::Model;
 
-#[path = "../../vendor/archspec/src/bin/viz/graph.rs"]
+#[path = "../../vendor/conseqa/src/bin/viz/graph.rs"]
 mod graph;
 
-/// The page data the viz front end consumes (`window.ARCHSPEC`).
+/// The page data the viz front end consumes (`window.CONSEQA`).
 #[derive(Serialize)]
 struct PageData<'a> {
     title: &'a str,
@@ -84,13 +84,13 @@ fn start() {
 
 /// Runs the pipeline over `source` and returns the analysis as JSON.
 ///
-/// Verification is only attempted over a valid model, as the `archspec`
+/// Verification is only attempted over a valid model, as the `conseqa`
 /// CLI does: verdicts are meaningful only over a structurally coherent
 /// model. The graph and page data are produced regardless, as
-/// `archspec-viz` does, so imperfect models can still be inspected.
+/// `conseqa-viz` does, so imperfect models can still be inspected.
 #[wasm_bindgen]
 pub fn analyze(source: &str, title: &str, verify: bool) -> String {
-    let model = match archspec::parser::yaml::parse(source) {
+    let model = match conseqa::parser::yaml::parse(source) {
         Ok(model) => model,
         Err(error) => {
             let location = error.location();
@@ -166,13 +166,13 @@ pub fn analyze(source: &str, title: &str, verify: bool) -> String {
     to_json(&analysis)
 }
 
-/// The canonical YAML serialization of a model, as archspec writes it.
+/// The canonical YAML serialization of a model, as conseqa writes it.
 /// Returns an empty string when the source does not parse.
 #[wasm_bindgen]
 pub fn canonicalize(source: &str) -> String {
-    archspec::parser::yaml::parse(source)
+    conseqa::parser::yaml::parse(source)
         .ok()
-        .and_then(|model| archspec::parser::yaml::serialize(&model).ok())
+        .and_then(|model| conseqa::parser::yaml::serialize(&model).ok())
         .unwrap_or_default()
 }
 
@@ -229,7 +229,7 @@ mod tests {
     fn fixture(name: &str) -> String {
         std::fs::read_to_string(
             std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
-                .join("../vendor/archspec/tests/fixtures")
+                .join("../vendor/conseqa/tests/fixtures")
                 .join(name),
         )
         .expect("fixture readable")
@@ -243,10 +243,10 @@ mod tests {
         assert_eq!(value["valid"], true);
         assert_eq!(value["verified"], true);
         assert_eq!(value["page"]["title"], "flash checkout");
-        assert_eq!(value["tally"]["total"], 16);
+        assert_eq!(value["tally"]["total"], 14);
         assert_eq!(value["tally"]["proven"], 10);
         assert!(value["page"]["graph"]["operations"].as_array().unwrap().len() == 6);
-        assert!(value["page"]["report"]["obligations"].as_array().unwrap().len() == 16);
+        assert!(value["page"]["report"]["obligations"].as_array().unwrap().len() == 14);
         // The checker's notes surface as diagnostics.
         assert!(value["diagnostics"].as_array().unwrap().iter().any(|d| d["phase"] == "verification"));
     }

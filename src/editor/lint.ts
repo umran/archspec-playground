@@ -24,7 +24,7 @@ export function lintDiagnostics(source: string, analysis: Analysis | null): Lint
       from,
       to: Math.max(from, lineEnd < 0 ? source.length : lineEnd),
       severity: "error",
-      source: "archspec parser",
+      source: "conseqa parser",
       message,
     });
     return out;
@@ -37,7 +37,7 @@ export function lintDiagnostics(source: string, analysis: Analysis | null): Lint
       from: range.from,
       to: range.to,
       severity: LINT_SEVERITY[diagnostic.severity],
-      source: `archspec ${diagnostic.phase}`,
+      source: `conseqa ${diagnostic.phase}`,
       message: describe(diagnostic),
     });
   }

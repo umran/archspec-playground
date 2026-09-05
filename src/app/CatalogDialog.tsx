@@ -20,7 +20,7 @@ interface Props {
   onSelect: (entry: CatalogEntry) => void;
 }
 
-/** The demo catalog: archspec's worked examples, with what each shows. */
+/** The demo catalog: conseqa's worked examples, with what each shows. */
 export function CatalogDialog({ open, onOpenChange, currentId, dirty, onSelect }: Props) {
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
@@ -29,7 +29,7 @@ export function CatalogDialog({ open, onOpenChange, currentId, dirty, onSelect }
           <div>
             <Dialog.Title className="text-lg font-semibold text-kumo-strong">Model catalog</Dialog.Title>
             <Dialog.Description className="mt-0.5 text-sm text-kumo-subtle">
-              Worked examples from the archspec repository, and a blank model. Each one loads into the editor,
+              Worked examples from the conseqa repository, and a blank model. Each one loads into the editor,
               where it can be changed freely.
             </Dialog.Description>
           </div>

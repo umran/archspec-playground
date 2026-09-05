@@ -3,8 +3,8 @@ import { Loader } from "@cloudflare/kumo/components/loader";
 import { GraphIcon, WarningCircleIcon } from "@phosphor-icons/react";
 import { memo } from "react";
 
-import { App as VizApp } from "../../vendor/archspec/viz/src/App";
-import type { Theme } from "../../vendor/archspec/viz/src/state/AppState";
+import { App as VizApp } from "../../vendor/conseqa/viz/src/App";
+import type { Theme } from "../../vendor/conseqa/viz/src/state/AppState";
 import type { PageData } from "../analysis/types";
 
 interface Props {
@@ -20,12 +20,12 @@ interface Props {
 }
 
 /**
- * The archspec-viz front end, mounted directly from the vendored source.
+ * The conseqa-viz front end, mounted directly from the vendored source.
  *
- * It is the same React application `archspec-viz` embeds in the HTML it
+ * It is the same React application `conseqa-viz` embeds in the HTML it
  * writes — the system graph, operation and machine views, the detail and
  * obligations panels — given the page data the WebAssembly build
- * produces instead of an injected `window.ARCHSPEC`. It is mounted once
+ * produces instead of an injected `window.CONSEQA`. It is mounted once
  * and fed new data as the model changes, so selection, the open route,
  * and the canvas's pan and zoom survive every keystroke.
  *
@@ -39,7 +39,7 @@ export const VizPane = memo(function VizPane({ page, booting, working, bootError
       <Centered>
         <Empty
           icon={<WarningCircleIcon size={48} className="text-kumo-danger" />}
-          title="archspec could not be loaded"
+          title="conseqa could not be loaded"
           description={bootError}
         />
       </Centered>
@@ -56,7 +56,7 @@ export const VizPane = memo(function VizPane({ page, booting, working, bootError
           <div className="flex flex-col items-center gap-3">
             <Loader />
             <span className="text-sm text-kumo-subtle">
-              {booting ? "loading the archspec model checker…" : "analyzing the model…"}
+              {booting ? "loading the conseqa model checker…" : "analyzing the model…"}
             </span>
           </div>
         ) : (

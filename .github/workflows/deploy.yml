@@ -20,7 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          # The archspec source the site is built against.
+          # The conseqa source the site is built against.
           submodules: true
 
       - uses: actions/setup-node@v4
@@ -46,7 +46,7 @@ jobs:
         run: npm run test:wasm
 
       # No BASE_PATH: the site is served from the root of its own
-      # domain, both at archspec.umran.ca and at the .pages.dev URL.
+      # domain, both at conseqa.umran.ca and at the .pages.dev URL.
       - name: Build the site
         run: npm run build
 
@@ -63,5 +63,5 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: >-
             pages deploy dist
-            --project-name=archspec-playground
+            --project-name=conseqa-playground
             --branch=${{ github.head_ref || github.ref_name }}

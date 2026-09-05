@@ -18,7 +18,7 @@ interface Stage {
   detail: string;
 }
 
-/** The three passes the archspec CLIs run, and how the model fared. */
+/** The three passes the conseqa CLIs run, and how the model fared. */
 function pipelineStages(state: AnalysisState, verify: boolean): Stage[] {
   const { analysis } = state;
 

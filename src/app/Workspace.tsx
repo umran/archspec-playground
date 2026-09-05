@@ -37,21 +37,24 @@ import { useDraft } from "./useDraft";
 import { useMediaQuery } from "./useMediaQuery";
 import { useTheme } from "./theme";
 
-const REPO = "https://github.com/umran/archspec";
+const REPO = "https://github.com/umran/conseqa";
+// The semantics live on their own site now; the playground only points
+// at them.
+const DOCS = "https://docs.conseqa.umran.ca";
 
 // The definition panel: wide enough for YAML at a readable size, never
 // so wide that the visualization becomes a sliver.
 const PANEL_MIN_WIDTH = 340;
 const PANEL_MAX_WIDTH = 900;
 const PANEL_DEFAULT_WIDTH = 560;
-const PANEL_WIDTH_KEY = "archspec-playground-panel-width";
-const PANEL_OPEN_KEY = "archspec-playground-panel-open";
+const PANEL_WIDTH_KEY = "conseqa-playground-panel-width";
+const PANEL_OPEN_KEY = "conseqa-playground-panel-open";
 // Shown until it is dismissed or the document is opened: the semantics
 // are the thing a first-time reader most needs and would least expect to
 // need, since the editor looks self-explanatory and the verdicts do not.
-const DOCS_PROMPT_KEY = "archspec-playground-docs-prompt-seen";
+const DOCS_PROMPT_KEY = "conseqa-playground-docs-prompt-seen";
 
-export function Workspace({ onOpenDocs }: { onOpenDocs: () => void }) {
+export function Workspace() {
   const draft = useDraft();
   const [verify, setVerify] = useState(true);
   const [catalogOpen, setCatalogOpen] = useState(false);
@@ -86,8 +89,8 @@ export function Workspace({ onOpenDocs }: { onOpenDocs: () => void }) {
 
   const openDocs = useCallback(() => {
     dismissDocsPrompt();
-    onOpenDocs();
-  }, [dismissDocsPrompt, onOpenDocs]);
+    window.open(DOCS, "_blank", "noopener,noreferrer");
+  }, [dismissDocsPrompt]);
 
   useEffect(() => {
     if (!copied) return;
@@ -131,7 +134,7 @@ export function Workspace({ onOpenDocs }: { onOpenDocs: () => void }) {
       initial={0.66}
       min={0.25}
       max={0.9}
-      storageKey="archspec-playground-editor-split"
+      storageKey="conseqa-playground-editor-split"
       label="Resize the diagnostics panel"
       top={
         <div className="flex h-full min-h-0 flex-col bg-kumo-base">
@@ -142,7 +145,7 @@ export function Workspace({ onOpenDocs }: { onOpenDocs: () => void }) {
             </div>
             <div className="flex shrink-0 items-center gap-1">
               <Tooltip
-                content="Expand the shorthand: rewrite as archspec serializes the model"
+                content="Expand the shorthand: rewrite as conseqa serializes the model"
                 render={
                   <Button
                     variant="ghost"
@@ -253,7 +256,7 @@ export function Workspace({ onOpenDocs }: { onOpenDocs: () => void }) {
           )}
 
           <div className="flex shrink-0 items-baseline gap-2">
-            <span className="font-semibold tracking-tight text-kumo-strong">archspec</span>
+            <span className="font-semibold tracking-tight text-kumo-strong">conseqa</span>
             <span className="hidden text-sm text-kumo-subtle sm:inline">playground</span>
           </div>
 
@@ -273,7 +276,7 @@ export function Workspace({ onOpenDocs }: { onOpenDocs: () => void }) {
           />
 
           <Tooltip
-            content="What every declaration means, and what the checker proves"
+            content="What every declaration means, and what the checker proves — on the docs site"
             render={
               <Button variant="ghost" size="sm" icon={BookOpenTextIcon} className="shrink-0" onClick={openDocs}>
                 <span className="hidden md:inline">Semantics</span>
@@ -305,13 +308,13 @@ export function Workspace({ onOpenDocs }: { onOpenDocs: () => void }) {
               }
             />
             <Tooltip
-              content="archspec on GitHub"
+              content="conseqa on GitHub"
               render={
                 <a
                   href={REPO}
                   target="_blank"
                   rel="noreferrer noopener"
-                  aria-label="archspec on GitHub"
+                  aria-label="conseqa on GitHub"
                   className="flex size-7 shrink-0 items-center justify-center rounded-md text-kumo-subtle transition-colors hover:bg-kumo-tint hover:text-kumo-default"
                 >
                   <GithubLogoIcon size={17} />
@@ -325,7 +328,7 @@ export function Workspace({ onOpenDocs }: { onOpenDocs: () => void }) {
           <Banner
             size="sm"
             icon={<BookOpenTextIcon weight="fill" />}
-            description="New to Archspec? Read the semantics."
+            description="New to Conseqa? Read the semantics."
             action={
               <>
                 <Banner.Action onClick={openDocs}>Open</Banner.Action>
@@ -437,13 +440,13 @@ function StatusBar({
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
         <PipelineStatus state={state} verify={verify} />
         {state.failure && <span className="text-xs text-kumo-danger">{state.failure}</span>}
-        {/* Which archspec built the module: useful, and the first thing
+        {/* Which conseqa built the module: useful, and the first thing
             to drop when the line is tight. */}
         <Tooltip
-          content="The archspec commit this WebAssembly module was built from"
+          content="The conseqa commit this WebAssembly module was built from"
           render={
             <span className="hidden cursor-default font-mono text-xs text-kumo-inactive sm:inline">
-              archspec@{__ARCHSPEC_REV__}
+              conseqa@{__CONSEQA_REV__}
             </span>
           }
         />

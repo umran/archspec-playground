@@ -1,9 +1,9 @@
 /* Kumo's utilities are compiled by Tailwind from the component sources it
-   ships, plus the viz front end imported from the vendored archspec tree.
+   ships, plus the viz front end imported from the vendored conseqa tree.
    Automatic source detection is off so the vendored Rust sources, YAML
    fixtures, and prebuilt viz bundle are never scanned. */
 @source "../node_modules/@cloudflare/kumo/dist/**/*.{js,jsx,ts,tsx}";
-@source "../vendor/archspec/viz/src/**/*.{ts,tsx}";
+@source "../vendor/conseqa/viz/src/**/*.{ts,tsx}";
 @source "./**/*.{ts,tsx}";
 @source "../index.html";
 @import "@cloudflare/kumo/styles/tailwind";
